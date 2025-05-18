@@ -1,0 +1,7 @@
+{
+    "name": "hot-dates-kitchen-automations",
+    "private": true,
+    "workspaces": [
+      "packages/*"
+    ]
+  }
