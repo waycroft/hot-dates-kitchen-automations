@@ -8,8 +8,25 @@
  * Learn more at https://developers.cloudflare.com/workers/
  */
 
+import { ShopifyClient } from 'shopify';
+import { Order, Shop } from './gql';
+
+async function main(request, env, ctx) {
+		const body = await request.json();
+		const { admin_graphql_api_id: orderId } = body;
+		const shopify = new ShopifyClient({
+			accessToken: env.SHOPIFY_ACCESS_TOKEN,
+			baseUrlGql: env.SHOPIFY_API_BASE_URL_GQL,
+		});
+		const shop = await shopify.gqlQuery(Shop.locations);
+		console.log(shop.data.locations.edges[0].node.address);
+		const order = await shopify.gqlQuery(Order.byId, { id: orderId });
+		return new Response(JSON.stringify(order));
+}
+
 export default {
 	async fetch(request, env, ctx) {
-		return new Response('Hello World!');
+		ctx.waitUntil(main(request, env, ctx));
+		return new Response('ok');
 	},
 };

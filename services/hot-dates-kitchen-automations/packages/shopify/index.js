@@ -14,22 +14,21 @@ class UserError extends Error {
   }
 }
 
-export default class ShopifyClient {
+export class ShopifyClient {
   headers = new Headers()
   constructor(options) {
-    const { accessToken, baseUrlGql, apiVersion } = options
+    const { accessToken, baseUrlGql } = options
     this.accessToken = accessToken
     this.baseUrlGql = baseUrlGql
-    this.apiVersion = apiVersion ?? '2025-04'
     this.headers.append('Content-Type', 'application/json')
     this.headers.append('X-Shopify-Access-Token', this.accessToken)
   }
 
   // Execute arbitrary GQL queries.
-  gqlQuery = async (
+  gqlQuery = async function (
     query,
     variables = {},
-  ) => {
+  ) {
     const headers = this.headers
     let res
     res = await fetch(this.baseUrlGql, {

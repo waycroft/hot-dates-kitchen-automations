@@ -2,6 +2,10 @@
   "name": "shopify",
   "module": "index.js",
   "type": "module",
+  "private": true,
+  "dependencies": {
+    "shopify": "workspace:*"
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },
