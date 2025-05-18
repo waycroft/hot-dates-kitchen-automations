@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "farzad-shipping-poc-bruno",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}
