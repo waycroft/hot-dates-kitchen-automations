@@ -1,16 +1,19 @@
 {
-	"name": "hot-dates-kitchen-auto-shipping-labels",
-	"version": "0.0.0",
-	"private": true,
-	"scripts": {
-		"deploy": "wrangler deploy",
-		"dev": "wrangler dev",
-		"start": "wrangler dev",
-		"test": "vitest"
-	},
-	"devDependencies": {
-		"@cloudflare/vitest-pool-workers": "^0.8.19",
-		"vitest": "~3.0.7",
-		"wrangler": "^4.15.2"
-	}
+  "name": "hot-dates-kitchen-auto-shipping-labels",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "start": "wrangler dev",
+    "test": "vitest"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.8.19",
+    "vitest": "~3.0.7",
+    "wrangler": "^4.15.2"
+  },
+  "dependencies": {
+    "jsonata": "^2.0.6"
+  }
 }
