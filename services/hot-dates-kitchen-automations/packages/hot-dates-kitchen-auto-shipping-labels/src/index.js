@@ -62,6 +62,7 @@ async function main(request, env, ctx) {
 					if (item.weight.unit === 'POUNDS') {
 						return acc + item.weight.value * 16
 					} else {
+						// TODO: Specifically handle other units, don't just return
 						return acc + item.weight.value
 					}
 				}, 0),
@@ -79,6 +80,11 @@ async function main(request, env, ctx) {
 		// Buy the rate
 		const buyResponse = await easypost.buyShipment(shipmentResponse.id, rateId)
 		console.log('Buy response:\n' + JSON.stringify(buyResponse, null, 2))
+
+		// Bookmark:
+		// - Add HTML templating for packing slip and email to fulfillment center
+		// - Return-based error handling
+
 	}
 }
 
