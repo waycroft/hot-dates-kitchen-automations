@@ -11,7 +11,7 @@
 import { ShopifyClient } from 'shopify';
 import { Order } from './gql';
 import { EasyPostClient } from 'easypost';
-
+import rules from './rules';
 async function main(request, env, ctx) {
 		const body = await request.json();
 		const { admin_graphql_api_id: orderId } = body;
@@ -80,7 +80,14 @@ async function main(request, env, ctx) {
 
 			// Create shipment
 			const shipmentResponse = await easypost.createShipment(shipment);
-			console.log('Shipment response:\n' + JSON.stringify(shipmentResponse, null, 2));
+			//console.log('Shipment response:\n' + JSON.stringify(shipmentResponse, null, 2));
+
+			// Choose a rate
+			const rateId = await rules(fulfillmentOrder, shipmentResponse);
+
+			// Buy the rate
+			const buyResponse = await easypost.buyShipment(shipmentResponse.id, rateId);
+			console.log('Buy response:\n' + JSON.stringify(buyResponse, null, 2));
 		}
 }
 

@@ -30,4 +30,22 @@ export class EasyPostClient {
         })
         return await res.json()
     }
+    
+    // Buy a shipment
+    buyShipment = async function (
+        shipmentId,
+        rateId,
+    ) {
+        console.log('Buying shipment ' + shipmentId + ' with rate ' + rateId)
+        const res = await fetch(`${this.baseUrl}/shipments/${shipmentId}/buy`, {
+            method: 'POST',
+            headers: this.headers,
+            body: JSON.stringify({
+                rate: {
+                    id: rateId,
+                }
+            }),
+        })
+        return await res.json()
+    }
 }
