@@ -47,19 +47,42 @@ export const Order = {
           phone
         }
         fulfillmentOrders(first: 100) {
-          edges {
-            node {
+            nodes {
               id
+              assignedLocation {
+                address1
+                address2
+                city
+                state: province
+                zip
+                countryCode
+                phone
+              }
               orderName
               status
+              destination {
+                email
+                firstName
+                lastName
+                address1
+                address2
+                city
+                state: province
+                zip
+                countryCode
+                phone
+              }
               lineItems(first: 100) {
-                edges {
-                  node {
-                    id
+                nodes {
+                  id
+                  variantTitle
+                  sku
+                  weight {
+                    value
+                    unit
                   }
                 }
               }
-            }
           }
         }
       }
