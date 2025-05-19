@@ -2,7 +2,7 @@
 
 // Get shop locations
 export const Shop = {
-    locations: `
+	locations: `
     query GetShopLocations {
       locations(first: 5) {
         edges {
@@ -27,7 +27,7 @@ export const Shop = {
 }
 
 export const Order = {
-  byId: `
+	byId: `
     query GetOrderById($id: ID!) {
       order(id: $id) {
         id
