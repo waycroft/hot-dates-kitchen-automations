@@ -2,6 +2,9 @@
     "name": "hot-dates-kitchen-automations",
     "private": true,
     "workspaces": [
-      "packages/*"
-    ]
-  }
+        "packages/*"
+    ],
+    "dependencies": {
+        "puppeteer": "^24.9.0"
+    }
+}
