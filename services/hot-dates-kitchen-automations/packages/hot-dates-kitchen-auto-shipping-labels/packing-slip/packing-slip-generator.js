@@ -82,7 +82,7 @@ const convertToPdf = async (fulfillmentOrder, errors, savePdf) => {
  * Creates packing slip pdfs from a batch of fulfillmentOrders. Optionally save pdf to output directory.
  * @param {fulfillmentOrder[]} fulfillmentOrders
  * @param {bool?} savePdf
- * @returns {Response}
+ * @returns {Promise<Response>}
  */
 
 const createPackingSlipPdfs = async (fulfillmentOrders, savePdf = false) => {
