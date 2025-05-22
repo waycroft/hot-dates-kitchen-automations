@@ -2,6 +2,7 @@ import { ShopifyClient } from 'shopify'
 import { Order } from './gql'
 import { EasyPostClient } from 'easypost'
 import rules from './rules'
+import { createPackingSlipPdfs } from '../packing-slip/packing-slip-generator'
 
 async function main(request, env, ctx) {
 	const body = await request.json()
@@ -82,9 +83,14 @@ async function main(request, env, ctx) {
 		console.log('Buy response:\n' + JSON.stringify(buyResponse, null, 2))
 
 		// Bookmark:
-		// - Add HTML templating for packing slip and email to fulfillment center
-		// - Return-based error handling
+		// Create packing slip pdf
+		const pdfsReponse = await createPackingSlipPdfs([fulfillmentOrder]);
+		if (pdfsReponse.errors.length > 0) {
+			// something went wrong
+		}
+		const packingSlipPdf = pdfsReponse[0];
 
+		// email pdf(s)
 	}
 }
 
