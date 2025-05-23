@@ -16,6 +16,7 @@
 		"wrangler": "^4.15.2"
 	},
 	"dependencies": {
-		"jsonata": "^2.0.6"
+		"jsonata": "^2.0.6",
+		"puppeteer": "^24.9.0"
 	}
 }
