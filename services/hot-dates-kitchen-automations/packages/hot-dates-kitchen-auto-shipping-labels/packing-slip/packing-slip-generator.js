@@ -32,7 +32,7 @@ const createHtml = async (fulfillmentOrder, errors) => {
 
     let tableRows = '';
     for(let i=0;i<lineItems.length;i++) {
-      const newRow = 
+      const newRow =
       `<tr>
         <td>${lineItems[i].variantTitle}</td>
         <td>${lineItems[i].quantity}</td>
@@ -63,15 +63,15 @@ const convertToPdf = async (htmlString, errors) => {
 };
 
 /**
- * @typedef Response
+ * @typedef CreatePdfsResponse
  * @property {Uint8Array[]} pdfs
  * @property {string[]} errors
  */
 /**
  * Creates packing slip pdfs from a batch of fulfillmentOrders.
- * Returns { pdfs: Uint8Array[], errors: string[] } 
+ * Returns { pdfs: Uint8Array[], errors: string[] }
  * @param {fulfillmentOrder[]} fulfillmentOrders
- * @returns {Promise<Response>}
+ * @returns {Promise<CreatePdfsResponse>}
  */
 
 const createPackingSlipPdfs = async (fulfillmentOrders) => {
