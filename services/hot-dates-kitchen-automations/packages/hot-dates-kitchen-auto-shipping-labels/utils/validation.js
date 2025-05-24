@@ -67,11 +67,9 @@ const validateAssignedLocation = (assignedLocation, orderId) => {
       .map((field) => `assignedLocation.${field} is missing in order ${orderId ?? 'Unknown'}.`)
 }
 
+// TODO: Consider what fields could be missing (and thus need to be validated) vs which fields we'll invariably expect
 const validateLineItem = (lineItem, orderId) => {
-  const requiredFields = [
-    'variantTitle',
-    'quantity'
-  ];
+  const requiredFields = []
 
   return requiredFields.filter((field) => !lineItem[field])
     .map((field) => `${field} is missing in line item ${lineItem.id || 'Unknown'} in order ${orderId || 'Unknown'}`);
