@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "bun run src/index.js",
+	"runtime": "bun --version",
+    "dev": "bun --watch run src/index.js",
     "format": "prettier --write ."
   },
   "devDependencies": {
