@@ -7,9 +7,8 @@ import { createPackingSlipPdfs } from '../packing-slip/packing-slip-generator'
 /**
  * @param {Request} req
  */
-async function purchaseShippingLabelsHandler(req) {
-	const body = await req.json()
-	const { admin_graphql_api_id: orderId } = body
+async function purchaseShippingLabelsHandler(reqBody) {
+	const { admin_graphql_api_id: orderId } = reqBody
 
 	// Instantiate Shopify client
 	const shopify = new ShopifyClient({
@@ -89,35 +88,26 @@ async function purchaseShippingLabelsHandler(req) {
 		const buyResponse = await easypost.buyShipment(shipmentResponse.id, rateId)
 		console.log('Buy response:\n' + JSON.stringify(buyResponse, null, 2))
 
-		// Bookmark:
 		// Create packing slip pdf
 		const pdfsReponse = await createPackingSlipPdfs([fulfillmentOrder]);
 		if (pdfsReponse.errors.length > 0) {
-			return new Response(JSON.stringify({
-				errors: pdfsReponse.errors
-			}), {
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				status: 500
-			})
+			console.error(
+				JSON.stringify({
+					errors: pdfsReponse.errors,
+				}),
+			)
+			return
 		}
 
-		return new Response(pdfsReponse, {
-			headers: {
-				'Content-Type': 'text/plain',
-			},
-			status: 200
-		})
+		if (pdfsReponse.pdfs === undefined) {
+			console.error("`pdfsResponse.pdfs[]` is undefined, something went wrong")
+		}
+
+		console.log('Packing slip PDFs generated')
+		console.log(pdfsReponse.pdfs.length)
 
 		const packingSlipPdf = pdfsReponse.pdfs[0];
-		console.log('Packing slip PDFs generated')
 
-		return new Response(Buffer.from(packingSlipPdf), {
-			headers: {
-				'Content-Type': 'application/pdf'
-			}
-		})
 
 		// email pdf(s)
 	}
@@ -129,7 +119,11 @@ const server = Bun.serve({
 		'/health': new Response('OK'),
 		'/favicon.ico': new Response('Not found', { status: 404 }),
 		'/hooks/purchase-shipping-labels': {
-			POST: purchaseShippingLabelsHandler,
+			POST: async (req) => {
+				const body = await req.json()
+				purchaseShippingLabelsHandler(body)
+				return new Response('ok')
+			},
 		},
 	},
 })
