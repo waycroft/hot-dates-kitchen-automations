@@ -1,3 +1,4 @@
+const htmlTemplate = `
 <!DOCTYPE html>
 <html>
 <head>
@@ -41,3 +42,8 @@
   </div>
 </body>
 </html>
+`;
+
+export {
+  htmlTemplate
+};

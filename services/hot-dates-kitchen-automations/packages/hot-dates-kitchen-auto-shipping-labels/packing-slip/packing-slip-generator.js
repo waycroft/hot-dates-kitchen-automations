@@ -1,12 +1,6 @@
-import { join } from 'path';
-import { unlink } from 'fs/promises';
 import puppeteer from 'puppeteer';
-import { validateFulfillmentOrder } from '../utils.js/validation';
-
-const DIR = import.meta.dirname;
-const TEMPLATE_PATH = join(DIR, 'packing-slip-template.html');
-const TEMP_HTML_PATH = join(DIR, 'temp/packing-slip-temp.html');
-const PDF_DEST = join(DIR, 'output');
+import { validateFulfillmentOrder } from '../utils/validation';
+import { htmlTemplate } from './packing-slip-template';
 
 const getName = (fulfillmentOrder) => `${fulfillmentOrder.destination.firstName} ${fulfillmentOrder.destination.lastName}`;
 
@@ -29,9 +23,8 @@ ${fulfillmentOrder.assignedLocation.phone}
 const createHtml = async (fulfillmentOrder, errors) => {
   const lineItems = fulfillmentOrder.lineItems.nodes;
   try {
-    const htmlFile = await Bun.file(TEMPLATE_PATH);
-    let htmlText = await htmlFile.text();
-    htmlText = htmlText
+    let htmlString = htmlTemplate;
+    htmlString = htmlString
       .replace('{{ order_id }}', fulfillmentOrder.id)
       .replace('{{ customer_name }}', getName(fulfillmentOrder))
       .replace('{{ customer_address }}', getToAddress(fulfillmentOrder));
@@ -45,26 +38,21 @@ const createHtml = async (fulfillmentOrder, errors) => {
       </tr>`;
       tableRows += newRow;
     }
-    htmlText = htmlText.replace('{{ table_body }}', tableRows);
-    await Bun.write(TEMP_HTML_PATH, htmlText);
+
+    htmlString = htmlString.replace('{{ table_body }}', tableRows);
+    return htmlString;
   } catch (err) {
     console.log(err);
     errors.push(err.message);
   }
 };
 
-const convertToPdf = async (fulfillmentOrder, errors, savePdf) => {
+const convertToPdf = async (htmlString, errors) => {
   try {
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
-    await page.goto(TEMP_HTML_PATH);
-    let pdf;
-    if (savePdf) {
-      const pdfName = `packing-slip-${fulfillmentOrder.id}.pdf`;
-      pdf = await page.pdf({ path: join(PDF_DEST, pdfName), format: 'A4' });
-    } else {
-      pdf = await page.pdf({ format: 'A4' });
-    }
+    await page.setContent(htmlString, { waitUntil: 'networkidle0' })
+    const pdf = await page.pdf({ format: 'A4' })
     await browser.close();
     return pdf;
   } catch (err) {
@@ -79,13 +67,13 @@ const convertToPdf = async (fulfillmentOrder, errors, savePdf) => {
  * @property {string[]} errors
  */
 /**
- * Creates packing slip pdfs from a batch of fulfillmentOrders. Optionally save pdf to output directory.
+ * Creates packing slip pdfs from a batch of fulfillmentOrders.
+ * Returns { pdfs: Uint8Array[], errors: string[] } 
  * @param {fulfillmentOrder[]} fulfillmentOrders
- * @param {bool?} savePdf
  * @returns {Promise<Response>}
  */
 
-const createPackingSlipPdfs = async (fulfillmentOrders, savePdf = false) => {
+const createPackingSlipPdfs = async (fulfillmentOrders) => {
   const start = performance.now();
   const pdfs = [];
   const errors = [];
@@ -101,11 +89,8 @@ const createPackingSlipPdfs = async (fulfillmentOrders, savePdf = false) => {
       // required field missing, early out
       continue;
     }
-    await createHtml(fulfillmentOrders[i], errors);
-    pdfs.push(await convertToPdf(fulfillmentOrders[i], errors, savePdf));
-    if (await (Bun.file(TEMP_HTML_PATH).exists())) {
-      await unlink(TEMP_HTML_PATH); // delete the temp file
-    }
+    const htmlString = await createHtml(fulfillmentOrders[i], errors);
+    pdfs.push(await convertToPdf(htmlString, errors));
     ++fulfillmentOrderCount;
   }
   const end = performance.now();
