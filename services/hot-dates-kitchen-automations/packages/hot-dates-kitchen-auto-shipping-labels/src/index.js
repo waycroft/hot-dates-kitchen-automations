@@ -88,7 +88,8 @@ async function main(request, env, ctx) {
 		if (pdfsReponse.errors.length > 0) {
 			// something went wrong
 		}
-		const packingSlipPdf = pdfsReponse[0];
+		const packingSlipPdf = pdfsReponse.pdfs[0];
+		console.log('Packing slip PDFs generated')
 
 		// email pdf(s)
 	}
