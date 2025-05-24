@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "wrangler dev",
+    "dev": "bun run src/index.js",
     "format": "prettier --write ."
   },
   "devDependencies": {
