@@ -124,14 +124,14 @@ async function purchaseShippingLabelsHandler(req) {
 }
 
 const server = Bun.serve({
-  port: 3000,
-  routes: {
-    "/health": new Response("OK"),
-    "/favicon.ico": new Response("Not found", { status: 404 }),
-	  "/hooks/purchase-shipping-labels": {
-		  POST: purchaseShippingLabelsHandler
-	  }
-  }
+	port: 3000,
+	routes: {
+		'/health': new Response('OK'),
+		'/favicon.ico': new Response('Not found', { status: 404 }),
+		'/hooks/purchase-shipping-labels': {
+			POST: purchaseShippingLabelsHandler,
+		},
+	},
 })
 
 if (server) {
