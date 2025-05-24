@@ -75,7 +75,9 @@ export const Order = {
               lineItems(first: 100) {
                 nodes {
                   id
-                  variantTitle
+                  variant {
+				  	displayName
+				  }
                   sku
                   weight {
                     value
