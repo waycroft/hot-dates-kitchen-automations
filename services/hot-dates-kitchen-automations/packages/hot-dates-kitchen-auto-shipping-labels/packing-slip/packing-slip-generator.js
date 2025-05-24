@@ -26,6 +26,7 @@ const createHtml = async (fulfillmentOrder, errors) => {
     let htmlString = htmlTemplate;
     htmlString = htmlString
       .replace('{{ order_id }}', fulfillmentOrder.id)
+      .replace('{{ order_date }}', fulfillmentOrder.orderDate) // TODO: assumption on model shape here. Might need to fix.
       .replace('{{ customer_name }}', getName(fulfillmentOrder))
       .replace('{{ customer_address }}', getToAddress(fulfillmentOrder));
 
