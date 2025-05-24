@@ -4,20 +4,23 @@ import { EasyPostClient } from 'easypost'
 import rules from './rules'
 import { createPackingSlipPdfs } from '../packing-slip/packing-slip-generator'
 
-async function main() {
-	const body = await request.json()
+/**
+ * @param {Request} req
+ */
+async function purchaseShippingLabelsHandler(req) {
+	const body = await req.json()
 	const { admin_graphql_api_id: orderId } = body
 
 	// Instantiate Shopify client
 	const shopify = new ShopifyClient({
-		accessToken: env.SHOPIFY_ACCESS_TOKEN,
-		baseUrlGql: env.SHOPIFY_API_BASE_URL_GQL,
+		accessToken: Bun.env.SHOPIFY_ACCESS_TOKEN,
+		baseUrlGql: Bun.env.SHOPIFY_API_BASE_URL_GQL,
 	})
 
 	// Instantiate EasyPost client
 	const easypost = new EasyPostClient({
-		apiKey: env.EASYPOST_API_KEY,
-		baseUrl: env.EASYPOST_API_BASE_URL,
+		apiKey: Bun.env.EASYPOST_API_KEY,
+		baseUrl: Bun.env.EASYPOST_API_BASE_URL,
 	})
 
 	// Get order by id
@@ -86,11 +89,47 @@ async function main() {
 		// Create packing slip pdf
 		const pdfsReponse = await createPackingSlipPdfs([fulfillmentOrder]);
 		if (pdfsReponse.errors.length > 0) {
-			// something went wrong
+			return new Response(JSON.stringify({
+				errors: pdfsReponse.errors
+			}), {
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				status: 500
+			})
 		}
+
+		return new Response(pdfsReponse, {
+			headers: {
+				'Content-Type': 'text/plain',
+			},
+			status: 200
+		})
+
 		const packingSlipPdf = pdfsReponse.pdfs[0];
 		console.log('Packing slip PDFs generated')
 
+		return new Response(Buffer.from(packingSlipPdf), {
+			headers: {
+				'Content-Type': 'application/pdf'
+			}
+		})
+
 		// email pdf(s)
 	}
+}
+
+const server = Bun.serve({
+  port: 3000,
+  routes: {
+    "/health": new Response("OK"),
+    "/favicon.ico": new Response("Not found", { status: 404 }),
+	  "/hooks/purchase-shipping-labels": {
+		  POST: purchaseShippingLabelsHandler
+	  }
+  }
+})
+
+if (server) {
+	console.info(`Bun server running on port ${server.port}`)
 }
