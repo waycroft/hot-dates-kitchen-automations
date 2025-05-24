@@ -4,7 +4,7 @@ import { EasyPostClient } from 'easypost'
 import rules from './rules'
 import { createPackingSlipPdfs } from '../packing-slip/packing-slip-generator'
 
-async function main(request, env, ctx) {
+async function main() {
 	const body = await request.json()
 	const { admin_graphql_api_id: orderId } = body
 
@@ -93,11 +93,4 @@ async function main(request, env, ctx) {
 
 		// email pdf(s)
 	}
-}
-
-export default {
-	async fetch(request, env, ctx) {
-		ctx.waitUntil(main(request, env, ctx))
-		return new Response('ok', { status: 202 })
-	},
 }
