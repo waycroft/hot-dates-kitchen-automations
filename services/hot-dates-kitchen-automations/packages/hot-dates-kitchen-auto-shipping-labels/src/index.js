@@ -65,9 +65,13 @@ async function purchaseShippingLabelsHandler(req) {
 				weight: fulfillmentOrder.lineItems.nodes.reduce((acc, item) => {
 					if (item.weight.unit === 'POUNDS') {
 						return acc + item.weight.value * 16
-					} else {
-						// TODO: Specifically handle other units, don't just return
+					} else if (item.weight.unit === 'OUNCES') {
 						return acc + item.weight.value
+					} else {
+						return new Response(`Item has weight specified in units ${item.weight.unit}. Please update the product's weight in the Admin in either pounds or ounces.`, {
+							headers: { 'Content-Type': 'text/plain' },
+							status: 500
+						})
 					}
 				}, 0),
 			},
