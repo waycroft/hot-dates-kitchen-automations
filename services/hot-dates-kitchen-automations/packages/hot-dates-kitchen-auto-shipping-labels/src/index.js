@@ -4,20 +4,22 @@ import { EasyPostClient } from 'easypost'
 import rules from './rules'
 import { createPackingSlipPdfs } from '../packing-slip/packing-slip-generator'
 
-async function main(request, env, ctx) {
-	const body = await request.json()
-	const { admin_graphql_api_id: orderId } = body
+/**
+ * @param {Request} req
+ */
+async function purchaseShippingLabelsHandler(reqBody) {
+	const { admin_graphql_api_id: orderId } = reqBody
 
 	// Instantiate Shopify client
 	const shopify = new ShopifyClient({
-		accessToken: env.SHOPIFY_ACCESS_TOKEN,
-		baseUrlGql: env.SHOPIFY_API_BASE_URL_GQL,
+		accessToken: Bun.env.SHOPIFY_ACCESS_TOKEN,
+		baseUrlGql: Bun.env.SHOPIFY_API_BASE_URL_GQL,
 	})
 
 	// Instantiate EasyPost client
 	const easypost = new EasyPostClient({
-		apiKey: env.EASYPOST_API_KEY,
-		baseUrl: env.EASYPOST_API_BASE_URL,
+		apiKey: Bun.env.EASYPOST_API_KEY,
+		baseUrl: Bun.env.EASYPOST_API_BASE_URL,
 	})
 
 	// Get order by id
@@ -62,9 +64,13 @@ async function main(request, env, ctx) {
 				weight: fulfillmentOrder.lineItems.nodes.reduce((acc, item) => {
 					if (item.weight.unit === 'POUNDS') {
 						return acc + item.weight.value * 16
-					} else {
-						// TODO: Specifically handle other units, don't just return
+					} else if (item.weight.unit === 'OUNCES') {
 						return acc + item.weight.value
+					} else {
+						return new Response(`Item has weight specified in units ${item.weight.unit}. Please update the product's weight in the Admin in either pounds or ounces.`, {
+							headers: { 'Content-Type': 'text/plain' },
+							status: 500
+						})
 					}
 				}, 0),
 			},
@@ -82,22 +88,46 @@ async function main(request, env, ctx) {
 		const buyResponse = await easypost.buyShipment(shipmentResponse.id, rateId)
 		console.log('Buy response:\n' + JSON.stringify(buyResponse, null, 2))
 
-		// Bookmark:
 		// Create packing slip pdf
 		const pdfsReponse = await createPackingSlipPdfs([fulfillmentOrder]);
 		if (pdfsReponse.errors.length > 0) {
-			// something went wrong
+			console.error(
+				JSON.stringify({
+					errors: pdfsReponse.errors,
+				}),
+			)
+			return
 		}
-		const packingSlipPdf = pdfsReponse.pdfs[0];
+
+		if (pdfsReponse.pdfs === undefined) {
+			console.error("`pdfsResponse.pdfs[]` is undefined, something went wrong")
+		}
+
 		console.log('Packing slip PDFs generated')
+		console.log(pdfsReponse.pdfs.length)
+
+		const packingSlipPdf = pdfsReponse.pdfs[0];
+
 
 		// email pdf(s)
 	}
 }
 
-export default {
-	async fetch(request, env, ctx) {
-		ctx.waitUntil(main(request, env, ctx))
-		return new Response('ok', { status: 202 })
+const server = Bun.serve({
+	port: 3000,
+	routes: {
+		'/health': new Response('OK'),
+		'/favicon.ico': new Response('Not found', { status: 404 }),
+		'/hooks/purchase-shipping-labels': {
+			POST: async (req) => {
+				const body = await req.json()
+				purchaseShippingLabelsHandler(body)
+				return new Response('ok')
+			},
+		},
 	},
+})
+
+if (server) {
+	console.info(`Bun server running on port ${server.port}`)
 }

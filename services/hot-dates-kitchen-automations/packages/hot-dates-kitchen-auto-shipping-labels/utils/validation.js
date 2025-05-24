@@ -32,6 +32,8 @@ export const validateFulfillmentOrder = (fulfillmentOrder) => {
     );
   }
 
+  // TODO: Do we need to ensure there is enough inventory? Or does Shopify do that automatically?
+
   return errors;
 };
 
@@ -44,8 +46,6 @@ const validateDestination = (destination, orderId) => {
     'state',
     'zip',
     'countryCode',
-    'phone',
-    'email',
   ];
 
   return requiredFields.filter(
@@ -60,7 +60,6 @@ const validateAssignedLocation = (assignedLocation, orderId) => {
     'state',
     'zip',
     'countryCode',
-    'phone'
   ];
 
   return requiredFields.filter(
