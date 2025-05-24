@@ -46,8 +46,6 @@ const validateDestination = (destination, orderId) => {
     'state',
     'zip',
     'countryCode',
-    'phone',
-    'email',
   ];
 
   return requiredFields.filter(
@@ -62,7 +60,6 @@ const validateAssignedLocation = (assignedLocation, orderId) => {
     'state',
     'zip',
     'countryCode',
-    'phone'
   ];
 
   return requiredFields.filter(
