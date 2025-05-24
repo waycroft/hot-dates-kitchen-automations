@@ -32,6 +32,8 @@ export const validateFulfillmentOrder = (fulfillmentOrder) => {
     );
   }
 
+  // TODO: Do we need to ensure there is enough inventory? Or does Shopify do that automatically?
+
   return errors;
 };
 
