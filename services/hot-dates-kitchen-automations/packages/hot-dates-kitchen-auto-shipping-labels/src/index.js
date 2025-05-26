@@ -3,6 +3,7 @@ import { Order } from './gql'
 import { EasyPostClient } from 'easypost'
 import rules from './rules'
 import { createPackingSlipPdfs } from '../packing-slip/packing-slip-generator'
+import constants from './constants'
 
 /**
  * @param {Request} req
@@ -37,7 +38,7 @@ async function purchaseShippingLabelsHandler(reqBody) {
 
 		const shipment = {
 			from_address: {
-				name: 'Hauser',
+				name: constants.fulfillment_centers.HAUSER,
 				street1: fulfillmentOrder.assignedLocation.address1,
 				street2: fulfillmentOrder.assignedLocation.address2,
 				city: fulfillmentOrder.assignedLocation.city,
