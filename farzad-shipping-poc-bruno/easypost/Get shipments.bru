@@ -1,0 +1,16 @@
+meta {
+  name: Get shipments
+  type: http
+  seq: 3
+}
+
+get {
+  url: https://api.easypost.com/v2/shipments
+  body: none
+  auth: basic
+}
+
+auth:basic {
+  username: {{easypost_api_key}}
+  password: 
+}
