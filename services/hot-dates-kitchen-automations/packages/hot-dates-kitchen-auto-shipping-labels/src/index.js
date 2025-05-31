@@ -108,6 +108,7 @@ async function purchaseShippingLabelsHandler(reqBody) {
 		console.log(pdfsReponse.pdfs.length)
 
 		const packingSlipPdf = pdfsReponse.pdfs[0];
+		await Bun.write('/Users/waycroft/Downloads/packingSlip.pdf', packingSlipPdf)
 
 
 		// email pdf(s)
