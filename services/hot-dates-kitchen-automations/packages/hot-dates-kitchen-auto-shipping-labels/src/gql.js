@@ -31,6 +31,7 @@ export const Order = {
     query GetOrderById($id: ID!) {
       order(id: $id) {
         id
+		createdAt
         name
         email
         phone

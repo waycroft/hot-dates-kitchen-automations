@@ -1,6 +1,7 @@
 import puppeteer from 'puppeteer';
 import { validateFulfillmentOrder } from '../utils/validation';
 import { htmlTemplate } from './packing-slip-template';
+import { DateTime } from 'luxon';
 
 const getName = (fulfillmentOrder) => `${fulfillmentOrder.destination.firstName} ${fulfillmentOrder.destination.lastName}`;
 
@@ -25,8 +26,8 @@ const createHtml = async (fulfillmentOrder, order, errors) => {
   try {
     let htmlString = htmlTemplate;
     htmlString = htmlString
-      .replace('{{ order_id }}', fulfillmentOrder.id)
-      .replace('{{ order_date }}', fulfillmentOrder.orderDate) // TODO: assumption on model shape here. Might need to fix.
+      .replace('{{ order_id }}', order.id)
+      .replace('{{ order_date }}', DateTime.fromISO(order.createdAt).toLocaleString(DateTime.DATE_MED))
       .replace('{{ customer_name }}', getName(fulfillmentOrder))
       .replace('{{ customer_address }}', getToAddress(fulfillmentOrder));
 
