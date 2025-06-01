@@ -14,7 +14,7 @@ const htmlTemplate = `
 <body>
   <div class="header">
     <h2>Packing Slip</h2>
-    <p>Order #{{ order_id }}</p>
+    <p>Order: {{ order_id }}</p>
     <p>Order date: {{ order_date }}</p>
   </div>
 
