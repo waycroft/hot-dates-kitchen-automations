@@ -33,10 +33,10 @@ const createHtml = async (fulfillmentOrder, order, errors) => {
       .replace('{{ customer_address }}', getToAddress(fulfillmentOrder));
 
     let tableRows = '';
-    for(let i=0;i<lineItems.length;i++) {
       const newRow =
       `<tr>
         <td>${lineItems[i].variant.displayName}</td>
+    for (let i = 0; i < lineItems.length; i++) {
         <td>${lineItems[i].totalQuantity}</td>
       </tr>`;
       tableRows += newRow;
