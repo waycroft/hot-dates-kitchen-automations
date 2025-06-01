@@ -114,7 +114,7 @@ async function purchaseShippingLabelsHandler(reqBody) {
 		// Email packing slip and shipping label
 		// Create Shopify Fulfillment, which closes a FulfillmentOrder
 		// https://shopify.dev/docs/apps/build/orders-fulfillment/order-management-apps/build-fulfillment-solutions
-		// https://shopify.dev/docs/api/admin-graphql/latest/mutations/fulfillmentCreateV2
+		// https://shopify.dev/docs/api/admin-graphql/latest/mutations/fulfillmentCreate
 	}
 }
 
