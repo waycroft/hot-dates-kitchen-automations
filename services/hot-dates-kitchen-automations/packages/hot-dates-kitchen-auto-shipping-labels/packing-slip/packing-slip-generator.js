@@ -36,8 +36,8 @@ const createHtml = async (fulfillmentOrder, order, errors) => {
     for(let i=0;i<lineItems.length;i++) {
       const newRow =
       `<tr>
-        <td>${lineItems[i].variantTitle}</td>
-        <td>${lineItems[i].quantity}</td>
+        <td>${lineItems[i].variant.displayName}</td>
+        <td>${lineItems[i].totalQuantity}</td>
       </tr>`;
       tableRows += newRow;
     }

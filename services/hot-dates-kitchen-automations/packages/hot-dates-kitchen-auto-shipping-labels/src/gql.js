@@ -47,10 +47,11 @@ export const Order = {
           country
           phone
         }
-        fulfillmentOrders(first: 100) {
+        fulfillmentOrders(first: 10) {
             nodes {
               id
               assignedLocation {
+			  	name
                 address1
                 address2
                 city
@@ -60,6 +61,11 @@ export const Order = {
                 phone
               }
               orderName
+			  orderProcessedAt
+			  requestStatus
+			  supportedActions {
+			  	action
+			  }
               status
               destination {
                 email
@@ -73,9 +79,12 @@ export const Order = {
                 countryCode
                 phone
               }
-              lineItems(first: 100) {
+              lineItems(first: 25) {
                 nodes {
                   id
+				  totalQuantity
+				  remainingQuantity
+				  inventoryItemId
                   variant {
 				  	displayName
 				  }
