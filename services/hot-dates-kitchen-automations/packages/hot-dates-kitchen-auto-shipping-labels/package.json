@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-	"runtime": "bun --version",
+    "runtime": "bun --version",
     "dev": "bun --watch run src/index.js",
     "format": "prettier --write ."
   },
@@ -11,9 +11,10 @@
     "prettier": "^3.5.3"
   },
   "dependencies": {
+    "easypost": "workspace:*",
     "jsonata": "^2.0.6",
+    "luxon": "^3.6.1",
     "puppeteer": "^24.9.0",
-	"shopify": "workspace:*",
-	"easypost": "workspace:*"
+    "shopify": "workspace:*"
   }
 }
