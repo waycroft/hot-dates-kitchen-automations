@@ -111,7 +111,10 @@ async function purchaseShippingLabelsHandler(reqBody) {
 		await Bun.write('/Users/waycroft/Downloads/packingSlip.pdf', packingSlipPdf)
 
 
-		// email pdf(s)
+		// Email packing slip and shipping label
+		// Create Shopify Fulfillment, which closes a FulfillmentOrder
+		// https://shopify.dev/docs/apps/build/orders-fulfillment/order-management-apps/build-fulfillment-solutions
+		// https://shopify.dev/docs/api/admin-graphql/latest/mutations/fulfillmentCreateV2
 	}
 }
 

@@ -26,8 +26,9 @@ const createHtml = async (fulfillmentOrder, order, errors) => {
   try {
     let htmlString = htmlTemplate;
     htmlString = htmlString
-      .replace('{{ order_id }}', order.name)
-      .replace('{{ order_date }}', DateTime.fromISO(order.createdAt).toLocaleString(DateTime.DATE_MED))
+      .replace('{{ order_id }}', fulfillmentOrder.orderName)
+	  // TODO: orderProcessedAt is not the same as the order's "createdAt" date. Will this be a problem?
+      .replace('{{ order_date }}', DateTime.fromISO(fulfillmentOrder.orderProcessedAt).toLocaleString(DateTime.DATE_MED))
       .replace('{{ customer_name }}', getName(fulfillmentOrder))
       .replace('{{ customer_address }}', getToAddress(fulfillmentOrder));
 
