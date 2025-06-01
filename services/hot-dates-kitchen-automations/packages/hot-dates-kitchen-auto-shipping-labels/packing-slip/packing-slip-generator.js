@@ -22,6 +22,7 @@ ${fulfillmentOrder.assignedLocation.city} ${fulfillmentOrder.assignedLocation.st
 ${fulfillmentOrder.assignedLocation.phone}
 `;
 
+// TODO: do we actually need the Order? Or can we pull everything we need from fulfillmentOrder fields
 const createHtml = async (fulfillmentOrder, order, errors) => {
   const lineItems = fulfillmentOrder.lineItems.nodes;
   try {
