@@ -2,6 +2,7 @@ import puppeteer from 'puppeteer';
 import { validateFulfillmentOrder } from '../utils/validation';
 import { htmlTemplate } from './packing-slip-template';
 import { DateTime } from 'luxon';
+import { getDefaultVariantDisplayName } from '../utils/utils';
 
 const getName = (fulfillmentOrder) => `${fulfillmentOrder.destination.firstName} ${fulfillmentOrder.destination.lastName}`;
 
@@ -33,14 +34,14 @@ const createHtml = async (fulfillmentOrder, order, errors) => {
       .replace('{{ customer_address }}', getToAddress(fulfillmentOrder));
 
     let tableRows = '';
-      const newRow =
-      `<tr>
-        <td>${lineItems[i].variant.displayName}</td>
     for (let i = 0; i < lineItems.length; i++) {
+	  const displayName = getDefaultVariantDisplayName(lineItems[i].variant.displayName)
+	  const newRow = `<tr>
+        <td>${displayName}</td>
         <td>${lineItems[i].totalQuantity}</td>
-      </tr>`;
-      tableRows += newRow;
-    }
+      </tr>`
+	  tableRows += newRow
+	}
 
     htmlString = htmlString.replace('{{ table_body }}', tableRows);
     return htmlString;

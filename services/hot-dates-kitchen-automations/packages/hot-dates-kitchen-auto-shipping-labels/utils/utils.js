@@ -12,3 +12,15 @@ export function extractNumberFromShopifyGuid(shopifyGuid) {
 	}
 	return null
 }
+
+/*
+ * Remove " - Default Title" string from product line items that are the default variant.
+ */
+export function getDefaultVariantDisplayName(variantDisplayName) {
+	const pattern = /(.*)(?: - Default Title)/
+	const match = pattern.exec(variantDisplayName)
+	if (match) {
+		return match[1]
+	}
+	return null
+}
