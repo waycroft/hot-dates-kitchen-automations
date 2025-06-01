@@ -90,7 +90,7 @@ async function purchaseShippingLabelsHandler(reqBody) {
 		console.log('Buy response:\n' + JSON.stringify(buyResponse, null, 2))
 
 		// Create packing slip pdf
-		const pdfsReponse = await createPackingSlipPdfs([fulfillmentOrder]);
+		const pdfsReponse = await createPackingSlipPdfs([fulfillmentOrder], order);
 		if (pdfsReponse.errors.length > 0) {
 			console.error(
 				JSON.stringify({

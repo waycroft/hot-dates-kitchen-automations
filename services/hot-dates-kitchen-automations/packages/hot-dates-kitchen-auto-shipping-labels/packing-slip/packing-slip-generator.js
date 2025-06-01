@@ -20,7 +20,7 @@ ${fulfillmentOrder.assignedLocation.city} ${fulfillmentOrder.assignedLocation.st
 ${fulfillmentOrder.assignedLocation.phone}
 `;
 
-const createHtml = async (fulfillmentOrder, errors) => {
+const createHtml = async (fulfillmentOrder, order, errors) => {
   const lineItems = fulfillmentOrder.lineItems.nodes;
   try {
     let htmlString = htmlTemplate;
@@ -70,11 +70,12 @@ const convertToPdf = async (htmlString, errors) => {
 /**
  * Creates packing slip pdfs from a batch of fulfillmentOrders.
  * Returns { pdfs: Uint8Array[], errors: string[] }
- * @param {fulfillmentOrder[]} fulfillmentOrders
+ * @param {FulfillmentOrder[]} fulfillmentOrders
+ * @param {Order} order
  * @returns {Promise<CreatePdfsResponse>}
  */
 
-const createPackingSlipPdfs = async (fulfillmentOrders) => {
+const createPackingSlipPdfs = async (fulfillmentOrders, order) => {
   const start = performance.now();
   const pdfs = [];
   const errors = [];
@@ -90,7 +91,7 @@ const createPackingSlipPdfs = async (fulfillmentOrders) => {
       // required field missing, early out
       continue;
     }
-    const htmlString = await createHtml(fulfillmentOrders[i], errors);
+    const htmlString = await createHtml(fulfillmentOrders[i], order, errors);
     pdfs.push(await convertToPdf(htmlString, errors));
     ++fulfillmentOrderCount;
   }
