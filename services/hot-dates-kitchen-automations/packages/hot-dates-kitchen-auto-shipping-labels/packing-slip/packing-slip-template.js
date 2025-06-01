@@ -5,7 +5,7 @@ const htmlTemplate = `
   <meta charset="UTF-8">
   <style>
     body { font-family: Arial, sans-serif; font-size: 12px; }
-    .header, .footer { text-align: center; }
+    .footer { text-align: center; margin-block-start: 32px; }
     .address { margin-bottom: 20px; }
     table { width: 100%; border-collapse: collapse; }
     th, td { border: 1px solid #000; padding: 8px; text-align: left; }
@@ -13,6 +13,7 @@ const htmlTemplate = `
 </head>
 <body>
   <div class="header">
+    <h1>Hot Date Kitchen</h1>
     <h2>Packing Slip</h2>
     <p>Order: {{ order_id }}</p>
     <p>Order date: {{ order_date }}</p>
@@ -39,7 +40,7 @@ const htmlTemplate = `
   </table>
 
   <div class="footer">
-    <p>Thank you for your order!</p>
+    <p>Thank you for shopping with us!</p>
   </div>
 </body>
 </html>
