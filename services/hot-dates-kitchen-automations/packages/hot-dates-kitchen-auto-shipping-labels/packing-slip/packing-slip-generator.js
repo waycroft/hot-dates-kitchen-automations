@@ -57,6 +57,7 @@ const convertToPdf = async (htmlString, errors) => {
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
     await page.setContent(htmlString, { waitUntil: 'networkidle0' })
+	// TODO: Will Hauser accept A4 size? Does it matter?
     const pdf = await page.pdf({ format: 'A4' })
     await browser.close();
     return pdf;
