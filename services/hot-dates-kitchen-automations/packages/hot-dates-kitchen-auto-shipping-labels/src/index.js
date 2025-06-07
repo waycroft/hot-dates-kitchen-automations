@@ -130,7 +130,11 @@ async function purchaseShippingLabelsHandler(reqBody) {
 			body: {
 				text: "Shipping label(s) and packing slip(s) attached!"
 			},
-			attachments: [{filename: `packing slip ${DateTime.now().toISO()}.pdf`, content: Buffer.from(packingSlipPdf)}]
+			attachments: [
+				{
+					filename: `packing slip ${DateTime.now().toISO()}.pdf`, content: Buffer.from(packingSlipPdf)
+				}
+			]
 		})
 	}
 }
