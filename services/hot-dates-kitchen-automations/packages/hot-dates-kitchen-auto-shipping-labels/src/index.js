@@ -118,24 +118,40 @@ async function purchaseShippingLabelsHandler(reqBody) {
 		await Bun.write('/Users/waycroft/Downloads/packingSlip.pdf', packingSlipPdf)
 
 
-		// Email packing slip and shipping label
 		// Create Shopify Fulfillment, which closes a FulfillmentOrder
 		// https://shopify.dev/docs/apps/build/orders-fulfillment/order-management-apps/build-fulfillment-solutions
 		// https://shopify.dev/docs/api/admin-graphql/latest/mutations/fulfillmentCreate
 
-		await mailClient.sendMail({
-			from: Bun.env.FULFILLMENTS_FROM_EMAIL,
-			to: env === "production" ? Bun.env.FULFILLMENTS_TO_EMAIL : Bun.env.TEST_TO_EMAIL,
-			subject: "Hot Dates Kitchen: Fulfillment order",
-			body: {
-				text: "Shipping label(s) and packing slip(s) attached!"
-			},
-			attachments: [
-				{
-					filename: `packing slip ${DateTime.now().toISO()}.pdf`, content: Buffer.from(packingSlipPdf)
-				}
-			]
-		})
+		// Email packing slip and shipping label
+		const message = {
+				from: Bun.env.FULFILLMENTS_FROM_EMAIL,
+				to: env === "production" ? Bun.env.FULFILLMENTS_TO_EMAIL : Bun.env.TEST_TO_EMAIL,
+				subject: "Hot Dates Kitchen: Fulfillment order",
+				body: {
+					text: `Shipping label link: ${buyResponse.postage_label.label_url}\n\nPacking slip attached.`
+				},
+				attachments: [
+					{
+						filename: `packing slip - ${DateTime.now().toISO()}.pdf`, content: Buffer.from(packingSlipPdf)
+					}
+				]
+			}
+		if (Bun.env.SEND_LIVE_EMAILS === "true") {
+			await mailClient.sendMail(message)
+		} else {
+			console.debug("Would have sent message (file contents replaced with length):")
+			const debugMessage = {
+				...message,
+				attachments: message.attachments.map((att) => {
+					return {
+						filename: att.filename,
+						contentLength: att.content ? att.content.length : null,
+						href: att.href ? att.href : undefined
+					}
+				})
+			}
+			console.debug(JSON.stringify(debugMessage, null, 2))
+		}
 	}
 }
 
