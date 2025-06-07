@@ -152,5 +152,5 @@ const server = Bun.serve({
 
 if (server) {
 	console.info(`Bun server running on port ${server.port}`)
-	console.info(`Environment: ${env}`)
+	console.info(`environment: ${env}`)
 }
