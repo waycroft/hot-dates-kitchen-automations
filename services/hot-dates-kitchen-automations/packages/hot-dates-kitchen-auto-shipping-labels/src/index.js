@@ -5,6 +5,7 @@ import { Order } from './gql'
 import rules from './rules'
 import { createPackingSlipPdfs } from '../packing-slip/packing-slip-generator'
 import constants from './constants'
+import { DateTime } from 'luxon'
 
 /**
  * @param {Request} req
@@ -127,7 +128,7 @@ async function purchaseShippingLabelsHandler(reqBody) {
 			body: {
 				text: "Shipping label(s) and packing slip(s) attached!"
 			},
-			attachments: [packingSlipPdf]
+			attachments: [{filename: `packing slip ${DateTime.now().toISO()}.pdf`, content: Buffer.from(packingSlipPdf)}]
 		})
 	}
 }
