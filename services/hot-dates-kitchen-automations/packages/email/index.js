@@ -5,7 +5,7 @@
 export class EmailClient {
   constructor() {
     this.transporter = nodemailer.createTransporter({
-      service: "SES-US-EAST-1",
+      service: Bun.env.NODEMAILER_SERVICE,
       auth: {
         user: Bun.env.AWS_ACCESS_KEY_ID,
         pass: Bun.env.AWS_SECRET_ACCESS_KEY,
