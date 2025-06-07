@@ -2,15 +2,16 @@
 // Try to design such that we can switch between SMTP/API-based email providers down the road.
 // Should abstract the email provider interface/business model away from simply sending email.
 
+import nodemailer from 'nodemailer'
+
 export class EmailClient {
   constructor() {
-    this.transporter = nodemailer.createTransporter({
+    this.transporter = nodemailer.createTransport({
       service: Bun.env.NODEMAILER_SERVICE,
       auth: {
-        user: Bun.env.AWS_ACCESS_KEY_ID,
-        pass: Bun.env.AWS_SECRET_ACCESS_KEY,
-      },
-      region: Bun.env.AWS_REGION,
+        user: Bun.env.SES_SMTP_USERNAME,
+        pass: Bun.env.SES_SMTP_PASSWORD
+      }
     });
   }
 
@@ -48,9 +49,10 @@ export class EmailClient {
       html: body.html, 
     }
 
+    if (replyTo != null) message.replyTo = replyTo; else message.replyTo = from
     if (body.text != null) message.text = body.text
-    if (body.attachments != null) message.attachments = body.attachments
+    if (attachments != null) message.attachments = attachments
 
-    await transporter.sendMail(message);
+    await this.transporter.sendMail(message);
   };
 }

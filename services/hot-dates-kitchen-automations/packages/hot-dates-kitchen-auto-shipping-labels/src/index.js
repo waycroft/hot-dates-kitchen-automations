@@ -1,6 +1,7 @@
 import { ShopifyClient } from 'shopify'
-import { Order } from './gql'
 import { EasyPostClient } from 'easypost'
+import { EmailClient } from 'email'
+import { Order } from './gql'
 import rules from './rules'
 import { createPackingSlipPdfs } from '../packing-slip/packing-slip-generator'
 import constants from './constants'
@@ -22,6 +23,9 @@ async function purchaseShippingLabelsHandler(reqBody) {
 		apiKey: Bun.env.EASYPOST_API_KEY,
 		baseUrl: Bun.env.EASYPOST_API_BASE_URL,
 	})
+
+	// Instantiate Email client
+	const mailClient = new EmailClient()
 
 	// Get order by id
 	const order = (await shopify.gqlQuery(Order.byId, { id: orderId })).data.order
@@ -115,6 +119,16 @@ async function purchaseShippingLabelsHandler(reqBody) {
 		// Create Shopify Fulfillment, which closes a FulfillmentOrder
 		// https://shopify.dev/docs/apps/build/orders-fulfillment/order-management-apps/build-fulfillment-solutions
 		// https://shopify.dev/docs/api/admin-graphql/latest/mutations/fulfillmentCreate
+
+		await mailClient.sendMail({
+			from: Bun.env.FULFILLMENTS_FROM_EMAIL,
+			to: Bun.env.TEST_TO_EMAIL,
+			subject: "Hot Dates Kitchen: Fulfillment order",
+			body: {
+				text: "Shipping label(s) and packing slip(s) attached!"
+			},
+			attachments: [packingSlipPdf]
+		})
 	}
 }
 
