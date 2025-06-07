@@ -30,7 +30,7 @@ export class EmailClient {
    * @param {EmailBody} body
    * @param {Attachment[]} attachments
    */
-  sendEmail = async function ({
+  sendMail = async function ({
     from,
     to,
     replyTo,
