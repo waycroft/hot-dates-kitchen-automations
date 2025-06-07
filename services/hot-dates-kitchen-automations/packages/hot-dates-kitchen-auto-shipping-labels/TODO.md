@@ -2,4 +2,4 @@
 
 # LATER
 
-- Logic for orders with multiple fulfillment locations
+- [ ] Logic for orders with multiple fulfillment locations

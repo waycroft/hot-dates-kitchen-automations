@@ -7,6 +7,8 @@ import { createPackingSlipPdfs } from '../packing-slip/packing-slip-generator'
 import constants from './constants'
 import { DateTime } from 'luxon'
 
+const env = Bun.env.NODE_ENV
+
 /**
  * @param {Request} req
  */
@@ -123,7 +125,7 @@ async function purchaseShippingLabelsHandler(reqBody) {
 
 		await mailClient.sendMail({
 			from: Bun.env.FULFILLMENTS_FROM_EMAIL,
-			to: Bun.env.TEST_TO_EMAIL,
+			to: env === "production" ? Bun.env.FULFILLMENTS_TO_EMAIL : Bun.env.TEST_TO_EMAIL,
 			subject: "Hot Dates Kitchen: Fulfillment order",
 			body: {
 				text: "Shipping label(s) and packing slip(s) attached!"
@@ -150,4 +152,5 @@ const server = Bun.serve({
 
 if (server) {
 	console.info(`Bun server running on port ${server.port}`)
+	console.info(`Environment: ${env}`)
 }
