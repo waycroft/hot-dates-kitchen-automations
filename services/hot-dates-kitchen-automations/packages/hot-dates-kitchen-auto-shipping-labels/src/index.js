@@ -68,7 +68,7 @@ async function purchaseShippingLabelsHandler(reqBody) {
 			parcel: {
 				// Easypost parcel always requires weight in ounces.
 				// TODO: Are dimensions required?
-				mode: 'test',
+				mode: env === "production" ? 'production' : 'test',
 				weight: fulfillmentOrder.lineItems.nodes.reduce((acc, item) => {
 					if (item.weight.unit === 'POUNDS') {
 						return acc + item.weight.value * 16
