@@ -101,3 +101,20 @@ export const Order = {
     }
   `,
 }
+export const Fulfillment = {
+  create: `
+    mutation fulfillmentCreate($fulfillment: FulfillmentInput!, $message: String) {
+	  fulfillmentCreate(fulfillment: $fulfillment, message: $message) {
+	    fulfillment {
+		  id
+		  status
+		  displayStatus
+	    }
+	    userErrors {
+	      field
+	      message
+	    }
+	  }
+	}
+  `,
+}

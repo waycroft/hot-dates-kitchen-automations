@@ -1,11 +1,12 @@
 import { ShopifyClient } from 'shopify'
 import { EasyPostClient } from 'easypost'
 import { EmailClient } from 'email'
-import { Order } from './gql'
+import { Order, Fulfillment } from './gql'
 import rules from './rules'
 import { createPackingSlipPdfs } from '../packing-slip/packing-slip-generator'
 import constants from './constants'
 import { DateTime } from 'luxon'
+import shopifyCarriers from './carrier-mapping.json'
 
 const env = Bun.env.NODE_ENV
 
@@ -35,13 +36,21 @@ async function purchaseShippingLabelsHandler(reqBody) {
 	//console.log(JSON.stringify(order, null, 2));
 
 	// We'll be generating shipping labels for each fulfillment order, so we'll loop through each fulfillment order and generate a shipping label for each
+	// Some info about Shopify fulfillment:
+	// Each FulfillmentOrder represents items assigned to a specific location/service
+	// Each Fulfillment represents an actual shipment going out
+	// One Fulfillment can satisfy multiple FulfillmentOrders if they're from the same location and ship together
+	// See the lifecycle of a FulfillmentOrder here: https://shopify.dev/docs/api/admin-graphql/latest/objects/FulfillmentOrder
 	const fulfillmentOrders = order.fulfillmentOrders.nodes
+	console.debug(`Order ${order.name} has ${fulfillmentOrders.length} fulfillmentOrders`)
 	for (const fulfillmentOrder of fulfillmentOrders) {
-		// Uncomment for prod
-		//if (fulfillmentOrder.status === "CLOSED") {
-		//	continue
-		//}
-		//console.log(JSON.stringify(fulfillmentOrder, null, 2));
+		if (env === "production") {
+			if (fulfillmentOrder.status === "CLOSED") {
+				continue
+			}
+		} else {
+			console.log(JSON.stringify(fulfillmentOrder, null, 2));
+		}
 
 		const shipment = {
 			from_address: {
@@ -94,11 +103,42 @@ async function purchaseShippingLabelsHandler(reqBody) {
 
 		// Buy the rate
 		const buyResponse = await easypost.buyShipment(shipmentResponse.id, rateId)
-		console.log('Buy response:\n' + JSON.stringify(buyResponse, null, 2))
+		//console.debug('Buy response:\n' + JSON.stringify(buyResponse, null, 2))
 
 		// Create Shopify Fulfillment, which closes a FulfillmentOrder
 		// https://shopify.dev/docs/apps/build/orders-fulfillment/order-management-apps/build-fulfillment-solutions
 		// https://shopify.dev/docs/api/admin-graphql/latest/mutations/fulfillmentCreate
+		// TODO: LATER: A multi-location concern, but: typically, each fulfillment order corresponds to a separate fulfillment, and multiple fulfillment orders usually arise from having multiple locations. However, there are edge cases where a single Fulfillment could be created to address multiple fulfillment orders, although these aren't that common. If those edge cases arise, the below conditional would need to be adjusted.
+		if (fulfillmentOrder.supportedActions.map(obj => obj.action).includes("CREATE_FULFILLMENT")) {
+			// Create fullfillment
+			const fulfillment = {
+				lineItemsByFulfillmentOrder: [
+					{
+						fulfillmentOrderId: fulfillmentOrder.id,
+						// By not specifying fulfillmentOrderLineItems, we automatically fulfill the entire order (i.e. we do not perform a partial fulfillment).
+					},
+				],
+				notifyCustomer: false,
+				originAddress: {
+					address1: fulfillmentOrder.assignedLocation.address1,
+					address2: fulfillmentOrder.assignedLocation.address2,
+					city: fulfillmentOrder.assignedLocation.city,
+					countryCode: fulfillmentOrder.assignedLocation.countryCode,
+					provinceCode: fulfillmentOrder.assignedLocation.province,
+					zip: fulfillmentOrder.assignedLocation.zip,
+				},
+				trackingInfo: {
+					company: shopifyCarriers[buyResponse.selected_rate.carrier], // enum, case sensitive: https://shopify.dev/docs/api/admin-graphql/latest/objects/FulfillmentTrackingInfo#supported-tracking-companies. Shopify will allow you to click in the UI to get shipping info if the correct company is set.
+					number: buyResponse.tracker.tracking_code,
+				},
+			}
+			if (env === "production") {
+				await shopify.gqlQuery(Fulfillment.create, { fulfillment: fulfillment })
+			} else {
+				console.debug(`Would have created Fulfillment for FulfillmentOrder ${fulfillmentOrder.id}:`)
+				console.debug(JSON.stringify(fulfillment, null, 2))
+			}
+		}
 
 		// Create packing slip pdf
 		const pdfsReponse = await createPackingSlipPdfs([fulfillmentOrder], order);
