@@ -96,6 +96,10 @@ async function purchaseShippingLabelsHandler(reqBody) {
 		const buyResponse = await easypost.buyShipment(shipmentResponse.id, rateId)
 		console.log('Buy response:\n' + JSON.stringify(buyResponse, null, 2))
 
+		// Create Shopify Fulfillment, which closes a FulfillmentOrder
+		// https://shopify.dev/docs/apps/build/orders-fulfillment/order-management-apps/build-fulfillment-solutions
+		// https://shopify.dev/docs/api/admin-graphql/latest/mutations/fulfillmentCreate
+
 		// Create packing slip pdf
 		const pdfsReponse = await createPackingSlipPdfs([fulfillmentOrder], order);
 		if (pdfsReponse.errors.length > 0) {
@@ -115,12 +119,8 @@ async function purchaseShippingLabelsHandler(reqBody) {
 		console.log(pdfsReponse.pdfs.length)
 
 		const packingSlipPdf = pdfsReponse.pdfs[0];
-		await Bun.write('/Users/waycroft/Downloads/packingSlip.pdf', packingSlipPdf)
-
-
-		// Create Shopify Fulfillment, which closes a FulfillmentOrder
-		// https://shopify.dev/docs/apps/build/orders-fulfillment/order-management-apps/build-fulfillment-solutions
-		// https://shopify.dev/docs/api/admin-graphql/latest/mutations/fulfillmentCreate
+		// Debugging
+		//await Bun.write('/Users/waycroft/Downloads/packingSlip.pdf', packingSlipPdf)
 
 		// Email packing slip and shipping label
 		const message = {
