@@ -43,7 +43,7 @@ const validateDestination = (destination, orderId) => {
     'lastName',
     'address1',
     'city',
-    'state',
+    'province',
     'zip',
     'countryCode',
   ];
@@ -57,7 +57,7 @@ const validateAssignedLocation = (assignedLocation, orderId) => {
   const requiredFields = [
     'address1',
     'city',
-    'state',
+    'province',
     'zip',
     'countryCode',
   ];

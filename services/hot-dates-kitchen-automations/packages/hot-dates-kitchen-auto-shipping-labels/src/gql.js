@@ -42,7 +42,7 @@ export const Order = {
           street1: address1
           street2: address2
           city
-          state: province
+          province
           zip: zip
           country
           phone
@@ -55,7 +55,7 @@ export const Order = {
                 address1
                 address2
                 city
-                state: province
+                province
                 zip
                 countryCode
                 phone
@@ -74,7 +74,7 @@ export const Order = {
                 address1
                 address2
                 city
-                state: province
+                province
                 zip
                 countryCode
                 phone

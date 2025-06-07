@@ -9,7 +9,7 @@ const getName = (fulfillmentOrder) => `${fulfillmentOrder.destination.firstName}
 const getToAddress = (fulfillmentOrder) => `
 ${fulfillmentOrder.destination.address1}<br>
 ${fulfillmentOrder.destination.address2 ? fulfillmentOrder.destination.address2 + '<br>' : ''}
-${fulfillmentOrder.destination.city} ${fulfillmentOrder.destination.state}, ${fulfillmentOrder.destination.zip} ${fulfillmentOrder.destination.countryCode}<br>
+${fulfillmentOrder.destination.city} ${fulfillmentOrder.destination.province}, ${fulfillmentOrder.destination.zip} ${fulfillmentOrder.destination.countryCode}<br>
 ${fulfillmentOrder.destination.phone ? fulfillmentOrder.destination.phone + '<br>' : ''}
 ${fulfillmentOrder.destination.email}
 `;
@@ -18,7 +18,7 @@ ${fulfillmentOrder.destination.email}
 const getFromAddress = (fulfillmentOrder) => `
 ${fulfillmentOrder.assignedLocation.address1}<br>
 ${fulfillmentOrder.assignedLocation.address2}{${fulfillmentOrder.assignedLocation.address2 ? '<br>' : ''}}
-${fulfillmentOrder.assignedLocation.city} ${fulfillmentOrder.assignedLocation.state}, ${fulfillmentOrder.assignedLocation.zip} ${fulfillmentOrder.assignedLocation.countryCode}<br>
+${fulfillmentOrder.assignedLocation.city} ${fulfillmentOrder.assignedLocation.province}, ${fulfillmentOrder.assignedLocation.zip} ${fulfillmentOrder.assignedLocation.countryCode}<br>
 ${fulfillmentOrder.assignedLocation.phone}
 `;
 
