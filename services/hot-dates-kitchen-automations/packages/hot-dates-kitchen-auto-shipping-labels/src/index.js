@@ -102,7 +102,7 @@ async function purchaseShippingLabelsHandler(reqBody) {
 			console.error(
 				JSON.stringify({
 					errors: pdfsReponse.errors,
-				}),
+				}, null, 2),
 			)
 			return
 		}
