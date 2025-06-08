@@ -7,6 +7,12 @@ import { createPackingSlipPdfs } from '../packing-slip/packing-slip-generator'
 import constants from './constants'
 import { DateTime } from 'luxon'
 import shopifyCarriers from './carrier-mapping.json'
+import * as Sentry from "@sentry/bun";
+
+Sentry.init({
+  dsn: Bun.env.SENTRY_DSN,
+  sendDefaultPii: true
+});
 
 const env = Bun.env.NODE_ENV
 
@@ -205,4 +211,5 @@ const server = Bun.serve({
 if (server) {
 	console.info(`Bun server running on port ${server.port}`)
 	console.info(`environment: ${env}`)
+	if (Sentry.getClient() && Sentry.isEnabled()) console.info("Sentry client established.")
 }
