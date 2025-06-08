@@ -2,7 +2,6 @@
 
 ## Deployment
 - [ ] Observability/logging
-	- [ ] Creater logger wrapper to control stdout for Cloudwatch for regular app logging
 	- [ ] Ensure customer data is excluded from Sentry and also application logs
 - [ ] Pre-flight: [Shopify webhooks best practices](https://shopify.dev/docs/apps/build/webhooks/best-practices)
 
