@@ -9,12 +9,14 @@ import { DateTime } from 'luxon'
 import shopifyCarriers from './carrier-mapping.json'
 import * as Sentry from "@sentry/bun";
 
-Sentry.init({
-  dsn: Bun.env.SENTRY_DSN,
-  sendDefaultPii: true
-});
-
 const env = Bun.env.NODE_ENV
+
+if (env === 'production') {
+	Sentry.init({
+		dsn: Bun.env.SENTRY_DSN,
+		sendDefaultPii: true,
+	})
+}
 
 /**
  * @param {Request} req
