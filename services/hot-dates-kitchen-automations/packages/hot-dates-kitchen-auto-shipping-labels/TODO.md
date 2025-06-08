@@ -4,6 +4,7 @@
 - [ ] Observability/logging
 	- [ ] Ensure customer data is excluded from Sentry and also application logs
 - [ ] Pre-flight: [Shopify webhooks best practices](https://shopify.dev/docs/apps/build/webhooks/best-practices)
+- [ ] Deploy to EC2
 
 ## App
 - [ ] Order cancellations: is automation required for cancelling fulfillment?
