@@ -1,0 +1,33 @@
+meta {
+  name: Delete webhook subscription
+  type: graphql
+  seq: 4
+}
+
+post {
+  url: https://termini-test-store.myshopify.com/admin/api/2025-04/graphql.json
+  body: graphql
+  auth: inherit
+}
+
+headers {
+  x-Shopify-Access-Token: {{shopify_access_token}}
+}
+
+body:graphql {
+  mutation webhookSubscriptionDelete($id: ID!) {
+    webhookSubscriptionDelete(id: $id) {
+      userErrors {
+        field
+        message
+      }
+      deletedWebhookSubscriptionId
+    }
+  }
+}
+
+body:graphql:vars {
+  {
+    "id": "gid://shopify/WebhookSubscription/1375275417731"
+  }
+}

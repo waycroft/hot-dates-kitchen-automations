@@ -1,0 +1,49 @@
+meta {
+  name: Create webhook subscription
+  type: graphql
+  seq: 2
+}
+
+post {
+  url: https://termini-test-store.myshopify.com/admin/api/2025-04/graphql.json
+  body: graphql
+  auth: inherit
+}
+
+headers {
+  x-Shopify-Access-Token: {{shopify_access_token}}
+}
+
+body:graphql {
+  mutation webhookSubscriptionCreate($topic: WebhookSubscriptionTopic!, $webhookSubscription: WebhookSubscriptionInput!) {
+    webhookSubscriptionCreate(topic: $topic, webhookSubscription: $webhookSubscription) {
+      webhookSubscription {
+        id
+        topic
+        filter
+        format
+        endpoint {
+          __typename
+          ... on WebhookHttpEndpoint {
+            callbackUrl
+          }
+        }
+      }
+      userErrors {
+        field
+        message
+      }
+    }
+  }
+}
+
+body:graphql:vars {
+  {
+    "topic": "ORDERS_PAID",
+    "webhookSubscription": {
+      "callbackUrl": "https://arizona-error-sponsored-ui.trycloudflare.com/hooks/purchase-shipping-labels",
+      "format": "JSON",
+      "includeFields": ["id", "admin_graphql_api_id", "created_at"]
+    }
+  }
+}
