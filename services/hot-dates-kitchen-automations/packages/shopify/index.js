@@ -16,10 +16,9 @@ class UserError extends Error {
 
 export class ShopifyClient {
   headers = new Headers()
-  constructor(options) {
-    const { accessToken, baseUrlGql } = options
-    this.accessToken = accessToken
-    this.baseUrlGql = baseUrlGql
+  constructor() {
+    this.accessToken = Bun.env.SHOPIFY_ACCESS_TOKEN
+    this.baseUrlGql = Bun.env.SHOPIFY_API_BASE_URL_GQL
     this.headers.append('Content-Type', 'application/json')
     this.headers.append('X-Shopify-Access-Token', this.accessToken)
   }

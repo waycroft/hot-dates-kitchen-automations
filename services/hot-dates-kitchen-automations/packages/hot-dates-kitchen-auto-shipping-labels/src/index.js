@@ -17,16 +17,10 @@ async function purchaseShippingLabelsHandler(reqBody) {
 	const { admin_graphql_api_id: orderId } = reqBody
 
 	// Instantiate Shopify client
-	const shopify = new ShopifyClient({
-		accessToken: Bun.env.SHOPIFY_ACCESS_TOKEN,
-		baseUrlGql: Bun.env.SHOPIFY_API_BASE_URL_GQL,
-	})
+	const shopify = new ShopifyClient()
 
 	// Instantiate EasyPost client
-	const easypost = new EasyPostClient({
-		apiKey: Bun.env.EASYPOST_API_KEY,
-		baseUrl: Bun.env.EASYPOST_API_BASE_URL,
-	})
+	const easypost = new EasyPostClient()
 
 	// Instantiate Email client
 	const mailClient = new EmailClient()
@@ -84,10 +78,7 @@ async function purchaseShippingLabelsHandler(reqBody) {
 					} else if (item.weight.unit === 'OUNCES') {
 						return acc + item.weight.value
 					} else {
-						return new Response(`Item has weight specified in units ${item.weight.unit}. Please update the product's weight in the Admin in either pounds or ounces.`, {
-							headers: { 'Content-Type': 'text/plain' },
-							status: 500
-						})
+						throw new Error(`Item has weight specified in units ${item.weight.unit}. Please update the product's weight in the Admin in either pounds or ounces.`)
 					}
 				}, 0),
 			},
@@ -203,6 +194,7 @@ const server = Bun.serve({
 		'/hooks/purchase-shipping-labels': {
 			POST: async (req) => {
 				const body = await req.json()
+				await Bun.write('sample-payload-2.json', JSON.stringify(body, null, 2))
 				purchaseShippingLabelsHandler(body)
 				return new Response('ok')
 			},

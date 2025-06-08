@@ -9,10 +9,9 @@
 
 export class EasyPostClient {
     headers = new Headers()
-    constructor(options) {
-        const { apiKey, baseUrl } = options
-        this.apiKey = apiKey
-        this.baseUrl = baseUrl
+    constructor() {
+		this.apiKey = Bun.env.EASYPOST_API_KEY
+		this.baseUrl = Bun.env.EASYPOST_API_BASE_URL
         this.headers.append('Content-Type', 'application/json')
         this.headers.append('Authorization', `Basic ${btoa(`${this.apiKey}:`)}`)
     }
