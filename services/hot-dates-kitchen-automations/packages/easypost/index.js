@@ -35,7 +35,6 @@ export class EasyPostClient {
         shipmentId,
         rateId,
     ) {
-        console.log('Buying shipment ' + shipmentId + ' with rate ' + rateId)
         const res = await fetch(`${this.baseUrl}/shipments/${shipmentId}/buy`, {
             method: 'POST',
             headers: this.headers,

@@ -1,3 +1,4 @@
+import logger from '../utils/logger'
 import puppeteer from 'puppeteer';
 import { validateFulfillmentOrder } from '../utils/validation';
 import { htmlTemplate } from './packing-slip-template';
@@ -47,7 +48,7 @@ const createHtml = async (fulfillmentOrder, order, errors) => {
     htmlString = htmlString.replace('{{ table_body }}', tableRows);
     return htmlString;
   } catch (err) {
-    console.log(err);
+    logger.error(err)
     errors.push(err.message);
   }
 };
@@ -62,7 +63,7 @@ const convertToPdf = async (htmlString, errors) => {
     await browser.close();
     return pdf;
   } catch (err) {
-    console.log(err);
+    logger.error(err)
     errors.push(err.message);
   }
 };
@@ -101,7 +102,7 @@ const createPackingSlipPdfs = async (fulfillmentOrders, order) => {
     ++fulfillmentOrderCount;
   }
   const end = performance.now();
-  console.log(`\nCreated ${fulfillmentOrderCount} packing slips in ${(end - start)/1000} seconds.`);
+  logger.debug(`\nCreated ${fulfillmentOrderCount} packing slips in ${(end - start)/1000} seconds.`);
   return {
     pdfs,
     errors

@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/bun";
 import { ShopifyClient } from 'shopify'
 import { EasyPostClient } from 'easypost'
 import { EmailClient } from 'email'
@@ -7,7 +8,7 @@ import { createPackingSlipPdfs } from '../packing-slip/packing-slip-generator'
 import constants from './constants'
 import { DateTime } from 'luxon'
 import shopifyCarriers from './carrier-mapping.json'
-import * as Sentry from "@sentry/bun";
+import logger from '../utils/logger.js'
 
 const env = Bun.env.NODE_ENV
 
@@ -35,7 +36,7 @@ async function purchaseShippingLabelsHandler(reqBody) {
 
 	// Get order by id
 	const order = (await shopify.gqlQuery(Order.byId, { id: orderId })).data.order
-	//console.log(JSON.stringify(order, null, 2));
+	logger.debug('order: ', JSON.stringify(order, null, 2));
 
 	// We'll be generating shipping labels for each fulfillment order, so we'll loop through each fulfillment order and generate a shipping label for each
 	// Some info about Shopify fulfillment:
@@ -44,14 +45,14 @@ async function purchaseShippingLabelsHandler(reqBody) {
 	// One Fulfillment can satisfy multiple FulfillmentOrders if they're from the same location and ship together
 	// See the lifecycle of a FulfillmentOrder here: https://shopify.dev/docs/api/admin-graphql/latest/objects/FulfillmentOrder
 	const fulfillmentOrders = order.fulfillmentOrders.nodes
-	console.debug(`Order ${order.name} has ${fulfillmentOrders.length} fulfillmentOrders`)
+	logger.debug(`Order ${order.name} has ${fulfillmentOrders.length} fulfillmentOrders`)
 	for (const fulfillmentOrder of fulfillmentOrders) {
 		if (env === "production") {
 			if (fulfillmentOrder.status === "CLOSED") {
 				continue
 			}
 		} else {
-			console.log(JSON.stringify(fulfillmentOrder, null, 2));
+			logger.debug(JSON.stringify(fulfillmentOrder, null, 2));
 		}
 
 		const shipment = {
@@ -91,18 +92,18 @@ async function purchaseShippingLabelsHandler(reqBody) {
 				}, 0),
 			},
 		}
-		//console.log('Shipment:\n' + JSON.stringify(shipment, null, 2));
+		//logger.debug('Shipment:\n' + JSON.stringify(shipment, null, 2));
 
 		// Create shipment
 		const shipmentResponse = await easypost.createShipment(shipment)
-		//console.log('Shipment response:\n' + JSON.stringify(shipmentResponse, null, 2));
+		//logger.debug('Shipment response:\n' + JSON.stringify(shipmentResponse, null, 2));
 
 		// Choose a rate
 		const rateId = await rules(fulfillmentOrder, shipmentResponse)
 
 		// Buy the rate
 		const buyResponse = await easypost.buyShipment(shipmentResponse.id, rateId)
-		//console.debug('Buy response:\n' + JSON.stringify(buyResponse, null, 2))
+		logger.debug('Buy response:\n' + JSON.stringify(buyResponse, null, 2))
 
 		// Create Shopify Fulfillment, which closes a FulfillmentOrder
 		// https://shopify.dev/docs/apps/build/orders-fulfillment/order-management-apps/build-fulfillment-solutions
@@ -134,15 +135,15 @@ async function purchaseShippingLabelsHandler(reqBody) {
 			if (env === "production") {
 				await shopify.gqlQuery(Fulfillment.create, { fulfillment: fulfillment })
 			} else {
-				console.debug(`Would have created Fulfillment for FulfillmentOrder ${fulfillmentOrder.id}:`)
-				console.debug(JSON.stringify(fulfillment, null, 2))
+				logger.debug(`Would have created Fulfillment for FulfillmentOrder ${fulfillmentOrder.id}:`)
+				logger.debug(JSON.stringify(fulfillment, null, 2))
 			}
 		}
 
 		// Create packing slip pdf
 		const pdfsReponse = await createPackingSlipPdfs([fulfillmentOrder], order);
 		if (pdfsReponse.errors.length > 0) {
-			console.error(
+			logger.error(
 				JSON.stringify({
 					errors: pdfsReponse.errors,
 				}, null, 2),
@@ -151,11 +152,11 @@ async function purchaseShippingLabelsHandler(reqBody) {
 		}
 
 		if (pdfsReponse.pdfs === undefined) {
-			console.error("`pdfsResponse.pdfs[]` is undefined, something went wrong")
+			logger.error("`pdfsResponse.pdfs[]` is undefined, something went wrong")
 		}
 
-		console.log('Packing slip PDFs generated')
-		console.log(pdfsReponse.pdfs.length)
+		logger.debug('Packing slip PDFs generated')
+		logger.debug(pdfsReponse.pdfs.length)
 
 		const packingSlipPdf = pdfsReponse.pdfs[0];
 		// Debugging
@@ -178,7 +179,7 @@ async function purchaseShippingLabelsHandler(reqBody) {
 		if (Bun.env.SEND_LIVE_EMAILS === "true") {
 			await mailClient.sendMail(message)
 		} else {
-			console.debug("Would have sent message (file contents replaced with length):")
+			logger.debug("Would have sent message (file contents replaced with length):")
 			const debugMessage = {
 				...message,
 				attachments: message.attachments.map((att) => {
@@ -189,7 +190,7 @@ async function purchaseShippingLabelsHandler(reqBody) {
 					}
 				})
 			}
-			console.debug(JSON.stringify(debugMessage, null, 2))
+			logger.debug(JSON.stringify(debugMessage, null, 2))
 		}
 	}
 }
@@ -211,7 +212,7 @@ const server = Bun.serve({
 })
 
 if (server) {
-	console.info(`Bun server running on port ${server.port}`)
-	console.info(`environment: ${env}`)
-	if (Sentry.getClient() && Sentry.isEnabled()) console.info("Sentry client established.")
+	logger.info(`Bun server running on port ${server.port}`)
+	logger.info(`environment: ${env}`)
+	if (Sentry.getClient() && Sentry.isEnabled()) logger.info("Sentry client established.")
 }
