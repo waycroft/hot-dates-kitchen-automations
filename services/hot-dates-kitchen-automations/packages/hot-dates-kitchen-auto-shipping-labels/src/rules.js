@@ -5,7 +5,7 @@ export default async function (fulfillmentOrder, easypostShipment) {
 	// TODO: Implement rules
 	// Until an interface for rules is designed, just hardcode the rules, which are:
 	// 1. Only choose rates that have expected delivery of 2 days or less
-	// 2. If the usps zone is 1 or 2, don't choose USPS as the carrier (any other zones, any carrier is acceptable)
+	// 2. If the usps zone is 3 or higher, don't choose USPS as the carrier (zones 1-2 can use any carrier)
 	// This function should return an easypost rate ID
 
 	const rates = easypostShipment.rates
@@ -19,7 +19,7 @@ export default async function (fulfillmentOrder, easypostShipment) {
 	//logger.debug('Rates for 2 days or less:\n' + JSON.stringify(ratesFor2DaysOrLess, null, 2))
 
 	// TODO: Double-check this logic
-	if (zone <= 2) {
+	if (zone > 2) {
 		const nonUSPSRates = ratesFor2DaysOrLess.filter((rate) => rate.carrier !== 'USPS')
 		//logger.debug('Cheapest non-USPS rate:\n' + JSON.stringify(nonUSPSRates[0], null, 2))
 		return nonUSPSRates[0].id
