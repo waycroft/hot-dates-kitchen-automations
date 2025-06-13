@@ -1,12 +1,32 @@
-const REDACT_KEYS = [
-  'firstName',
-  'lastName',
-  'email',
-  'address1',
-  'address2',
-  'zip',
-  'phone'
-];
+const REDACT_KEYS = {
+  order: [
+    'customer.firstName',
+    'customer.lastName',
+    'customer.email',
+    'customer.phone',
+    'customer.note',
+    'customer.defaultAddress',
+    'shippingAddress',
+    'billingAddress',
+    'note',
+    'noteAttributes',
+    'paymentDetails.creditCardBin',
+    'paymentDetails.creditCardNumber',
+    'paymentDetails.name',
+    'paymentDetails.expirationMonth',
+    'paymentDetails.expirationYear',
+    'metafields.email'
+  ],
+  fulfillmentOrder: [
+    'firstName',
+    'lastName',
+    'email',
+    'address1',
+    'address2',
+    'zip',
+    'phone'
+  ]
+};
 
 const redactKeySet = new Set(REDACT_KEYS.map(k => k.toLowerCase()));
 
@@ -37,13 +57,13 @@ const redactPII = (obj) => {
   return obj;
 };
 
-const containsPII = (obj) => {
+const containsPII = (obj, piiKeys) => {
   if (Array.isArray(obj)) {
     return obj.some(containsPII);
   } else if (obj && typeof obj === 'object') {
     for (const [key, val] of Object.entries(obj)) {
       if (
-        (redactKeySet.has(key.toLowerCase()) ||
+        (piiKeys.has(key.toLowerCase()) ||
         // shopify custom properties
         (key === 'custom_attributes' && Array.isArray(val))) &&
         val != null &&
@@ -51,23 +71,35 @@ const containsPII = (obj) => {
         val !== '[REDACTED]'
       ) {
         return true;
-      }
+     fulfillmentOrder }
       if (containsPII(val)) {
         return true;
       }
-    }
+  e }
   }
   return false;
 };
 
 const redactFulfillmentOrder = (ffo) => {
   const redactedOrder = ffo;
-  ffo.destination = redactPII(ffo.destination);
+  redactedOrder.destination = redactPII(redactedOrder.destination, REDACT_KEYS.fulfillmentOrder);
   return redactedOrder;
 };
+
+const redactOrder = (o) => {
+  const redacted = o;
+  redacted = redactPII(order, REDACT_KEYS.order)
+  return redacted;
+};
+
+const fullfillmentOrderContainsPII = (ffo) => containsPII(ffo, REDACT_KEYS.fulfillmentOrder);
+const orderContainsPII = (o) => containsPII(o, REDACT_KEYS.o);
 
 export {
   redactPII,
   containsPII,
-  redactFulfillmentOrder
+  redactFulfillmentOrder,
+  redactOrder,
+  fullfillmentOrderContainsPII,
+  orderContainsPII
 }
