@@ -1,6 +1,5 @@
 name: Run Bun Tests
 
-
 on:
   push:
     branches:
