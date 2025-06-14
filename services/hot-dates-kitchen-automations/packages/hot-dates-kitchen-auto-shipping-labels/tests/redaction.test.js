@@ -3,10 +3,7 @@ import mockFulfillmentOrder from './mock-data/fulfillmentOrder';
 import mockOrder from './mock-data/order';
 import {
   containsPII,
-  fullfillmentOrderContainsPII,
-  orderContainsPII,
-  redactFulfillmentOrder,
-  redactOrder
+  redactPII,
 } from '../utils/redactPII';
 
 test('containsPII returns true if obj has PII', () => {
@@ -16,12 +13,20 @@ test('containsPII returns true if obj has PII', () => {
 
 test('redactFulfillmentOrder redacts sensitive data', () => {
   const fulfillmentOrder = mockFulfillmentOrder;
-  const redactedFulfillmentOrder = redactFulfillmentOrder(fulfillmentOrder);
-  expect(fullfillmentOrderContainsPII(redactedFulfillmentOrder)).toBe(false);
+  const redactedFulfillmentOrder = redactPII(fulfillmentOrder);
+  expect(containsPII(redactedFulfillmentOrder)).toBe(false);
+  // sanity checks
+  expect(redactedFulfillmentOrder.destination.address1).toBe('[REDACTED]')
+  expect(redactedFulfillmentOrder.destination.email).toBe('[REDACTED]')
+  expect(redactedFulfillmentOrder.destination.firstName).toBe('[REDACTED]')
 });
 
 test('redactOrder redacts sensitive data', () => {
   const order = mockOrder;
-  const redactedOrder = redactOrder(order);
-  expect(orderContainsPII(redactedOrder)).toBe(false);
+  const redactedOrder = redactPII(order);
+  expect(containsPII(redactedOrder)).toBe(false);
+  // sanity checks
+  expect(redactedOrder.email).toBe('[REDACTED]')
+  expect(redactedOrder.customer.defaultAddress.address1).toBe('[REDACTED]')
+  expect(redactedOrder.paymentDetails.creditCardNumber).toBe('[REDACTED]')
 });

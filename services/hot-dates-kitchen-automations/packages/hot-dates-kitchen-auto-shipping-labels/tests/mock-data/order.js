@@ -95,3 +95,5 @@ const mockOrder = {
   },
   sourceName: "web"
 };
+
+export default mockOrder;
